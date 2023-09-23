@@ -1,6 +1,6 @@
 # Base Template for Compose Projects
 
-<img alt="Project Logo" height="350" src="G:\Compose\BaseTemplate\img.png" width="200"/>
+<img alt="Project Logo" height="720" width="350" src=https://github.com/prashant17d97/ComposeBaseTemplate/assets/84988691/f41b94b9-f98f-4143-95d2-5b8bb226f1a4/>
 
 **Base Template for Compose Projects** is a starting point for creating Android apps with Jetpack Compose. It provides a structured project setup and integration of essential libraries and tools to kickstart your Android development journey with Compose.
 
