@@ -24,7 +24,7 @@ import com.example.basetemplate.repo.uistatus.COLOR
 import com.example.basetemplate.repo.uistatus.CurrentStateIndicator
 import com.example.basetemplate.repo.uistatus.Icon
 import com.example.basetemplate.ui.navigation.NavGraph
-import com.example.basetemplate.ui.presentation.Offline
+import com.example.basetemplate.ui.presentation.OfflineScreen
 import com.example.basetemplate.ui.presentation.SnackBar
 import com.example.basetemplate.ui.presentation.UiLoadingStateInfo
 import com.example.basetemplate.ui.theme.BaseTemplateTheme
@@ -83,9 +83,11 @@ class MainActivity : ComponentActivity() {
                         contentAlignment = Alignment.Center
                     ) {
                         // Set up the navigation graph using NavGraph
-                        NavGraph(navHostController = rememberNavController())
+                        AnimatedVisibility(visible = isOnline==true) {
+                            NavGraph(navHostController = rememberNavController())
+                        }
                         AnimatedVisibility(isOnline == false || isOnline == null) {
-                            Offline()
+                            OfflineScreen()
                         }
 
                         // Display UI status information using UiStatesInfo
