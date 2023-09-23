@@ -53,7 +53,6 @@ import kotlinx.coroutines.launch
 fun UiLoadingStateInfo(currentStateIndicator: CurrentStateIndicator) {
     when (currentStateIndicator) {
         is CurrentStateIndicator.FullScreenLoader -> FullScreenLoader(
-            message = currentStateIndicator.message,
             uiState = currentStateIndicator
         )
 
@@ -77,7 +76,6 @@ fun UiLoadingStateInfo(currentStateIndicator: CurrentStateIndicator) {
  */
 @Composable
 fun FullScreenLoader(
-    message: String,
     uiState: CurrentStateIndicator.FullScreenLoader,
     onCancel: () -> Unit = {},
     onProceed: () -> Unit = {}
@@ -115,7 +113,7 @@ fun FullScreenLoader(
                     )
                 )
                 Text(
-                    text = message, style = MaterialTheme.typography.titleMedium
+                    text = uiState.message, style = MaterialTheme.typography.titleMedium
                 )
                 if (uiState.actionAllowed) {
                     Row(

@@ -12,6 +12,7 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     val currentLoadingStateIndicator = uiStatusInfoOwner.currentUILoadingState
+    val isOnline = uiStatusInfoOwner.isNetWorkAvailable
 
     fun updateLoadingState(currentStateIndicator: CurrentStateIndicator) {
         uiStatusInfoOwner.setUIState(currentStateIndicator = currentStateIndicator)

@@ -6,15 +6,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
@@ -22,6 +24,7 @@ import com.example.basetemplate.repo.uistatus.COLOR
 import com.example.basetemplate.repo.uistatus.CurrentStateIndicator
 import com.example.basetemplate.repo.uistatus.Icon
 import com.example.basetemplate.ui.navigation.NavGraph
+import com.example.basetemplate.ui.presentation.Offline
 import com.example.basetemplate.ui.presentation.SnackBar
 import com.example.basetemplate.ui.presentation.UiLoadingStateInfo
 import com.example.basetemplate.ui.theme.BaseTemplateTheme
@@ -49,6 +52,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             // Collect the UI status information from the mainViewModel as a State
             val currentStateIndicator by mainViewModel.currentLoadingStateIndicator.collectAsState()
+            val isOnline by mainViewModel.isOnline.collectAsState()
             val snackBarHostState = remember { SnackbarHostState() }
 
             // Create the app's theme using BaseTemplateTheme
@@ -72,13 +76,17 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 ) {
-                    Surface(
+                    Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(it)
+                            .padding(it),
+                        contentAlignment = Alignment.Center
                     ) {
                         // Set up the navigation graph using NavGraph
                         NavGraph(navHostController = rememberNavController())
+                        AnimatedVisibility(isOnline == false || isOnline == null) {
+                            Offline()
+                        }
 
                         // Display UI status information using UiStatesInfo
                         UiLoadingStateInfo(currentStateIndicator = currentStateIndicator)
