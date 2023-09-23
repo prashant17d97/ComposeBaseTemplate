@@ -4,17 +4,26 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class UiStatusInfoImpl : UiStatusInfoOwner {
-    private val _uiState: MutableStateFlow<UIState> =
-        MutableStateFlow(UIState.LOADING())
-    override val uiState: StateFlow<UIState>
+    private val _uiState: MutableStateFlow<CurrentStateIndicator> =
+        MutableStateFlow(CurrentStateIndicator.IDLE)
+    override val currentUILoadingState: StateFlow<CurrentStateIndicator>
         get() = _uiState
 
-    override fun setUIState(loadingType: UIState) {
-        _uiState.tryEmit(loadingType)
+    private val _isNetWorkAvailable: MutableStateFlow<Boolean?> =
+        MutableStateFlow(null)
+    override val isNetWorkAvailable: StateFlow<Boolean?>
+        get() = _isNetWorkAvailable
+
+    override fun setUIState(currentStateIndicator: CurrentStateIndicator) {
+        _uiState.tryEmit(currentStateIndicator)
     }
 
-    override fun loadRead(loadingType: UIState) {
-        _uiState.tryEmit(loadingType)
+    override fun setNetWorkAvailability(isAvailable: Boolean?) {
+        _isNetWorkAvailable.tryEmit(isAvailable)
+    }
+
+    override fun loadRead(currentStateIndicator: CurrentStateIndicator) {
+        _uiState.tryEmit(currentStateIndicator)
     }
 
 

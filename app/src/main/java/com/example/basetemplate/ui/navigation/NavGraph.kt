@@ -26,7 +26,7 @@ fun NavGraph(navHostController: NavHostController) {
                 type = NavType.IntType
             }
         )) {
-            val id = it.arguments?.getInt(postArgs,0)
+            val id = it.arguments?.getInt(postArgs, 0)
             Post(id = id)
         }
     }

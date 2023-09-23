@@ -16,68 +16,30 @@ interface UiStatusInfoOwner {
     /**
      * A [StateFlow] representing the current UI state.
      */
-    val uiState: StateFlow<UIState>
+    val currentUILoadingState: StateFlow<CurrentStateIndicator>
+    val isNetWorkAvailable: StateFlow<Boolean?>
 
     /**
-     * Function to set the UI state to a new [LoadingType].
+     * Function to set the UI state to a new [CurrentStateIndicator].
      *
-     * @param loadingType The new UI state to set.
+     * @param currentStateIndicator The new UI state to set.
      */
-    fun setUIState(loadingType: UIState)
+    fun setUIState(currentStateIndicator: CurrentStateIndicator)
+    fun setNetWorkAvailability(isAvailable: Boolean?)
 
-    fun loadRead(loadingType: UIState = UIState.LOADING())
+    fun loadRead(
+        currentStateIndicator: CurrentStateIndicator = CurrentStateIndicator.FullScreenLoader(
+            "Please wait! while loading..."
+        )
+    )
 
 }
 
-/**
- * Sealed class representing various UI states, such as Loading, Error, Success, and Failure.
- */
-sealed class UIState {
-
-    /**
-     * UI state indicating that the system is in a loading state.
-     *
-     * @param message The loading message to display (default is "Please wait!").
-     * @param type The type of loading indicator (default is FullScreenLoader).
-     */
-    data class LOADING(
-        val type: LoadingType = LoadingType.FullScreenLoader(message = "Please wait!")
-    ) : UIState()
-
-    /**
-     * UI state indicating an error condition.
-     *
-     * @param type The type of error display (e.g., SnackBar).
-     */
-    data class Error(val type: LoadingType) : UIState()
-
-    /**
-     * UI state indicating a success condition.
-     *
-     * @param type The type of success display (e.g., SnackBar).
-     */
-    data class Success(val type: LoadingType) : UIState()
-
-    /**
-     * UI state indicating a failure condition.
-     *
-     * @param type The type of failure display (e.g., SnackBar).
-     */
-    data class Failure(val type: LoadingType) : UIState()
-
-    val loadingType: LoadingType
-        get() = when (val uiState = this) {
-            is Error -> uiState.type
-            is Failure -> uiState.type
-            is LOADING -> uiState.type
-            is Success -> uiState.type
-        }
-}
 
 /**
  * Sealed class representing various types of loading indicators.
  */
-sealed class LoadingType {
+sealed class CurrentStateIndicator {
     /**
      * Loading indicator displayed as a SnackBar.
      *
@@ -92,10 +54,10 @@ sealed class LoadingType {
         val message: String,
         val actionLabel: String = "Proceed",
         val actionAllowed: Boolean = true,
-        @DrawableRes val icon: Int = R.drawable.ic_success,
+        val icon: Icon = Icon.SUCCESS,
         val duration: SnackbarDuration = SnackbarDuration.Short,
-        @ColorRes val backgroundColor: Int = R.color.success
-    ) : LoadingType()
+        val backgroundColor: COLOR = COLOR.SUCCESS
+    ) : CurrentStateIndicator()
 
     /**
      * Loading indicator displayed as a Toast message.
@@ -103,7 +65,8 @@ sealed class LoadingType {
      * @param message to display info.
      * @param duration The duration of the Toast (default is Toast.LENGTH_SHORT).
      */
-    data class Toasts(val message: String, val duration: Int = Toast.LENGTH_SHORT) : LoadingType()
+    data class Toasts(val message: String, val duration: Int = Toast.LENGTH_SHORT) :
+        CurrentStateIndicator()
 
     /**
      * Loading indicator displayed as a full-screen loader.
@@ -123,8 +86,26 @@ sealed class LoadingType {
         val actionAllowed: Boolean = false,
         val dismissOnBackPress: Boolean = true,
         val dismissOnClickOutside: Boolean = true,
-        @DrawableRes val icon: Int = R.drawable.warning,
+        val icon: Icon = Icon.Loading,
         val duration: SnackbarDuration = SnackbarDuration.Short,
-        @ColorRes val backgroundColor: Int = R.color.loading
-    ) : LoadingType()
+        val backgroundColor: COLOR = COLOR.Loading
+    ) : CurrentStateIndicator()
+
+    data object IDLE : CurrentStateIndicator()
+}
+
+enum class COLOR(@ColorRes val color: Int) {
+    Loading(R.color.loading),
+    WARNING(R.color.warning),
+    SUCCESS(R.color.success),
+    INFO(R.color.success),
+    ERROR(R.color.error),
+}
+
+enum class Icon(@DrawableRes val icon: Int) {
+    Loading(R.drawable.ic_loading),
+    WARNING(R.drawable.warning),
+    SUCCESS(R.drawable.ic_success),
+    INFO(R.drawable.ic_ligh_bulb),
+    ERROR(R.drawable.ic_error),
 }

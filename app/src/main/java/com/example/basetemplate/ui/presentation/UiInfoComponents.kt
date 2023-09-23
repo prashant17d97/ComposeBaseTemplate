@@ -39,28 +39,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.basetemplate.R
-import com.example.basetemplate.repo.uistatus.LoadingType
-import kotlinx.coroutines.delay
+import com.example.basetemplate.repo.uistatus.CurrentStateIndicator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 
 /**
  * Composable function for displaying UI loading state information.
  *
- * @param message The message to display.
- * @param uiState The type of loading indicator to use.
+ * @param currentStateIndicator The type of loading indicator to use.
  */
 @Composable
-fun UiLoadingStateInfo(loadingType: LoadingType) {
-    when (loadingType) {
-        is LoadingType.FullScreenLoader -> FullScreenLoader(
-            message = loadingType.message,
-            uiState = loadingType
+fun UiLoadingStateInfo(currentStateIndicator: CurrentStateIndicator) {
+    when (currentStateIndicator) {
+        is CurrentStateIndicator.FullScreenLoader -> FullScreenLoader(
+            message = currentStateIndicator.message,
+            uiState = currentStateIndicator
         )
 
-        is LoadingType.Toasts -> Toast.makeText(
+        is CurrentStateIndicator.Toasts -> Toast.makeText(
             LocalContext.current,
-            loadingType.message,
-            loadingType.duration
+            currentStateIndicator.message,
+            currentStateIndicator.duration
         ).show()
 
         else -> {}
@@ -78,7 +78,7 @@ fun UiLoadingStateInfo(loadingType: LoadingType) {
 @Composable
 fun FullScreenLoader(
     message: String,
-    uiState: LoadingType.FullScreenLoader,
+    uiState: CurrentStateIndicator.FullScreenLoader,
     onCancel: () -> Unit = {},
     onProceed: () -> Unit = {}
 ) {
@@ -95,7 +95,7 @@ fun FullScreenLoader(
             modifier = Modifier.padding(15.dp),
             shape = RoundedCornerShape(10.dp),
             colors = CardDefaults.cardColors(
-                containerColor = colorResource(id = uiState.backgroundColor)
+                containerColor = colorResource(id = uiState.backgroundColor.color)
             ),
             elevation = CardDefaults.cardElevation()
         ) {
@@ -142,26 +142,28 @@ fun FullScreenLoader(
 /**
  * Composable function for displaying a SnackBar.
  *
- * @param message The message to display.
  * @param uiState The configuration for the SnackBar.
  * @param onAction The callback function to invoke when the action is clicked.
  */
 @Composable
 fun SnackBar(
-    message: String,
-    uiState: LoadingType.SnackBar,
-    onAction: () -> Unit = {},
-    snackBarHostState: SnackbarHostState
+    uiState: CurrentStateIndicator.SnackBar,
+    snackBarHostState: SnackbarHostState,
+    coroutineScope: CoroutineScope,
+    onAction: () -> Unit = {}
 ) {
-    LaunchedEffect(key1 = Unit) {
-        snackBarHostState.showSnackbar(
-            message = message, duration = uiState.duration, actionLabel = uiState.actionLabel
-        )
-
+    LaunchedEffect(key1 = uiState) {
+        coroutineScope.launch {
+            snackBarHostState.showSnackbar(
+                message = uiState.message,
+                duration = uiState.duration,
+                actionLabel = uiState.actionLabel
+            )
+        }
     }
     SnackbarHost(snackBarHostState) { data ->
         Snackbar(modifier = Modifier.padding(12.dp),
-            containerColor = colorResource(id = uiState.backgroundColor),
+            containerColor = colorResource(id = uiState.backgroundColor.color),
             contentColor = Color.Black,
             content = {
                 Row(
@@ -169,10 +171,10 @@ fun SnackBar(
                     horizontalArrangement = Arrangement.Start
                 ) {
                     Image(
-                        painter = painterResource(id = uiState.icon),
+                        painter = painterResource(id = uiState.icon.icon),
                         contentDescription = "SnackBarIcon",
 
-                    )
+                        )
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(data.visuals.message)
                 }

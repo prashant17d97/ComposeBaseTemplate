@@ -26,6 +26,11 @@ class PostViewModel @Inject constructor(
     /**
      * Asynchronously fetches and updates the list of posts.
      */
+
+    init {
+        getPost()
+    }
+
     fun getPost() {
         viewModelScope.launch {
             repository.getPost()
